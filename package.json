@@ -1,0 +1,19 @@
+{
+  "name": "nxf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Node JS Framework",
+  "main": "index.js",
+  "dependencies": {
+    "underscore": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "\"nxf\""
+  ],
+  "author": "",
+  "license": "ISC"
+}
