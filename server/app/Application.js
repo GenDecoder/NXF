@@ -1,6 +1,11 @@
 Nx.define('APP.Application', {
     extend: 'Nx.Application',
 
+    // in teory if you open the orm and the instance
+    // there is no sense in hidding the models or any other
+
+    // the momento, abri todo, no ocultes nada....
+
     // global: {
     //     fs: require('fs'),
     //     cy: require('bcryptjs'),
@@ -27,8 +32,10 @@ Nx.define('APP.Application', {
         }
     },
 
-    init: function() {
+    init: function() { // only this one
         var me = this;
+        
+
         // me.orm = require('sequelize');
         // me.instance = new me.orm(me._CONFIG.DB.name, me._CONFIG.DB.username, me._CONFIG.DB.password, {
         //     dialect: 'mysql',
@@ -37,7 +44,7 @@ Nx.define('APP.Application', {
         // LOS DEMAS NO DEBEN EXTENDER DE APPLICATION, PERO SI PUEDEN ACCEDER VIA: APP.Application.orm, APP.Application.instance
     },
 
-    initDB: function() {
+    initDB: function() { // no init debe
         var me = this;
         // var orm = require('sequelize');
         // var instance = new orm(me._CONFIG.DB.name, me._CONFIG.DB.username, me._CONFIG.DB.password, {

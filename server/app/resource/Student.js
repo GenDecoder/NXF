@@ -1,8 +1,14 @@
 Nx.define('APP.resource.Student', {
     extend: 'APP.resource.BaseEntity',
-
+    mixins: [
+        "APP.mixin.Common"
+    ],    
     baseUrl: 'student',
-    init: function () {
+    construtor: function(models) {
+        // the problem with this is that the intelligence is not gonna work
+        // try;
+    },
+    init: function () {        
         var me = this;
         me.register([{
             type: 'get',
@@ -21,5 +27,8 @@ Nx.define('APP.resource.Student', {
             fn: me.remove,
             url: 'remove'
         }]);
+    },
+    create: function(req, res) {
+        res.json({success: 'Proper method'});
     }
 });

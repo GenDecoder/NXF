@@ -1,8 +1,18 @@
 Nx.define('APP.model.Student', {
-    extend: 'Nx.Model',
-    schema: function(orm, instance) {
-        var me = this;
+    extend: 'Nx.Model',    
+    init: function() {
+        me.expose(
+            me.getSchema()
+        );
 
+        me.addDependency({
+            name: 'Student',
+            value: me.getSchema()
+        });
+    },
+    getSchema: function() {
+        var orm = APP.application.orm;
+        var instance = APP.application.instance;
         return instance.define(me.ENTITY, {
             id: {
                 type: orm.INTEGER,

@@ -1,5 +1,6 @@
 Nx.define('APP.resource.BaseEntity', {
     extend: 'Nx.Resource',
+    // extend: 'APP.resource.Student',
 
     test: 1,
 

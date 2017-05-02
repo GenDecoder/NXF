@@ -19,118 +19,97 @@ if (!global.Nx) {
  */
 function Nox(config) {
     var me = this;
+    var group = [];    
     var router = config.router;
     var name = config.name || "APP";
     var folder = config.folder + "/";
-    var group = {
-        mixin: [],
-        singleton: [],
-
-        model: [],
-        resource: [],
-        middleware: [],
-        application: []
-    };
-    var sourceMap = {};
     var pathMap = pathManager.getPathMap(name, folder);
+    var mixinUp = function(source) {
+        _.each(source.mixins, function iterator(mixinNxPath) {            
+            var mixinsInstance;
+            var mixinSource = mapper.getExposedSource(mixinNxPath);
+            if (!_.isFunction(mixinSource)) {
+                bootUp(mixinNxPath);
+                mixinSource = mapper.getExposedSource(mixinNxPath);
+            }
+            mixinsInstance = new mixinSource();
+            for (var prop in mixinsInstance)
+                if (!source.hasOwnProperty(prop))
+                    source[prop] = mixinsInstance[prop];            
+        });
+    };
+    var bootUp = function (nxPath) {        
+        var instance;
+        var parentNxPath;
+        var newConstructor;
+        var source = mapper.getExposedSource(nxPath);
+        if (!_.isFunction(source)) {
+            parentNxPath = source.extend;
+            parent = parentNxPath ? bases.hasOwnProperty(parentNxPath) ? bases[parentNxPath] : mapper.getExposedSource(parentNxPath) : null;
+            // Apply properties to source.
+            mixinUp(source);           
+            // Inheritance proccess.
+            newConstructor = dp.iacc(source, parent, router); // validar esto de cuando enviar el router
+            // Expose source (Constructor).
+            mapper.setExposedSource(nxPath, newConstructor);
+            // Create and initialize instance.
+            if (!_.isEqual(this.toString(), "open")) {
+                instance = new newConstructor();
+                _.isFunction(instance.init) && instance.init();
+            }
+            console.log(nxPath);
+        }
+    };
     try {
         // Validate Application Name (Should be unique because of the global variable used).
         if (!global[name])
             global[name] = {};
         else
             throw new Error("Application with name: " + name + " is already in use.");
-        // Add "Define" method to "Nx".
+        // Adding "Define" method to "Nx".
         Nx.define = function(nxPath, scope) {
-            if (Nx.contains(pathMap.js.nxPathList, nxPath)) 
+            if (Nx.contains(pathMap.js.nxPathList, nxPath)) {
+                var nxClass = 
                  mapper.addExposedSource(nxPath, scope);
-            else
+            } else
                  throw new Error(nxPath + " not found, review the file structure or look for typo errors in the Nx.define, there must exists consistency");
         };        
         // Trigger the "Nx.define" method for all Sources.
         _.each(pathMap.js.absolutePathList, function iterator(absolutePath) {
             require(absolutePath);
         });
-        //
-        _.each(pathMap.js.nxPathList, function iterator(nxPath) {
-            var object;            
-            var parent;
+        // Create roads and group them.
+        _.each(pathMap.js.nxPathList, function iterator(nxPath) {           
             var groupName;
             var road = [];
-            // Create roads.
             while(nxPath && !bases.hasOwnProperty(nxPath)) {
-                road.push(nxPath);
-                object = mapper.getExposedSource(nxPath);
-                if (object)
-                    nxPath = object.extend;
-                else    
-                    throw new Error(nxPath + " is not defined");
+                var source = mapper.getExposedSource(nxPath);
+                // HERE I CAN SEPARATE ALL MIXINS
+                if (!_.contains(road, nxPath))
+                    road.push(nxPath);
+                else
+                    throw new Error("Infinite loop created: Review: " + road.join(', '));
+                nxPath = source.extend;
             }
-            // Assign a group  to each sources.
-            if (bases.hasOwnProperty(nxPath)) {
-                parent = bases[nxPath];
-                groupName = nxPath.split('.')[1].toLowerCase();
-            } else
-                groupName = "mixin"; // ANOTHER proccess NEEDED
-
-            // LA LOGICA SERA,  QUE TODOS LOS QUE NO SON PARTE DE LOS BASES, SERAN MIXINS
-            // EN ESTE MISMO LUGAR, CREAR UN ARRAY DE MIXINS, FINALMENTE, SI LOS MIXINS EN GROUP[MIXIN]
-            // SON LO MISMO QUE LOS MIXINS USADOS EN LOS RESOURCES TODO BIEN, PERO SU
-            // UN MIXIN ES ENCONTRADO COMO TIPO RESOURCE, MIDDLEWARE, MODEL U OTRO, ENTONCES LANZAR Error
-            // LOS MIXINS QUE NO SEAN USADOS COMO MIXINS, Y ESTE EN GROUP[MIXIN], SON UTILITARIOS, QUE PUEDEN SER ACCEDIDOS por
-            // LA VARIABLE GLOBAL DIRECTAMENTE....
-
-            // ESTABA PENSADO EN PASARLE LOS MODELS COMO PARAMETRO EN EL INIT....AUN QUEDA DEFINIR ESTO.
-
-            // INHERITANCE PROCESS
-            Nx.each(road, function iterator(nxPath) {
-                // Send "router" only if first
-                // Pass "router" only if Nx.Middleware or Nx.Resource
-                object = mapper.getExposedSource(nxPath);
-                if (!sourceMap[nxPath]) {
-                    group[groupName].push(nxPath);
-                    // error de parent is always a base
-                    sourceMap[nxPath] = dp.createClass(object, parent, router);
-                }
-            });
+            groupName = nxPath || "open";
+            if (!group[groupName])
+                group[groupName] = [];
+            group[groupName].push(road.reverse());
         });
-
-        _.each(sourceMap, function iterator(sourceClass, nxPath) {
-            mapper.setExposedSource(nxPath, sourceClass);
-            var instance = new sourceClass();
-            instance.init && instance.init();            
-        });
-
-
-
-        // Init per group
-            // First:   Application (Singleton) // validate only one
-            // Second:  Models
-            // Thrid:   Middlewares
-            // Fourth:  Resources
-
-        // Clean variables
-        group = {};
-        sourceMap = {};
-        delete Nx.define;
-     
-        //         // los que llegan aca a son mixin o son singleton
-        //         // los mixin no puede ser singleton, y los que son singleton son expuestos
-        //         console.log(nxPath + " can be a mixin or a util that must be exposed");
-        //         // no debo exponer a los util asi por asi, deben tener la palabra singleton
-        //         // APPLICATION SI ES SINGLETON, ES EL UNICO QUE QUEDA EXPUESTO, PERO . O NO?
-        //     }
-        //     // validation for just one application apply at the end of this process
-            
-        // }
+        function loopMatrix(road) {
+            _.each(road, bootUp, this);
+        }
+        // Boot Up Proccess.
+        _.each(group["open"], loopMatrix, "open");
+        // only those that are singleton are open
+        _.each(group["Nx.Application"], loopMatrix, "Nx.Application"); // the group must have only one array
+        _.each(group["Nx.Model"], loopMatrix, "Nx.Model");
+        _.each(group["Nx.Middleware"], loopMatrix, "Nx.Middleware");
+        _.each(group["Nx.Resource"], loopMatrix, "Nx.Resource");
+        delete Nx.define;        
     } catch(error) {
          console.log(error);
-    }
-    
+    }    
     return router;
-//     o que es usado como mixin no puede ser un singleton (no puede ser expuesto ya que no debe poder ser alterado)
-
-// TODOS LOS: RESOURCES, MIDDLEWARES, MODELS CAN NOT BE EXPOSED, SO CAN NOT BE SINGLETONS, NEITHER USED AS MIXINS
-
-// lo que se hace por detras es que se extienda de un mixin, pero un mixin no puede ser resource, middleware ni model, ni application
 }
 module.exports = Nox;
