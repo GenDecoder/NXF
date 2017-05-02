@@ -1,35 +1,25 @@
 Nx.define('APP.resource.Student', {
     extend: 'APP.resource.BaseEntity',
 
-    base: '/student',
+    baseUrl: 'student',
     init: function () {
         var me = this;
-        
-        me.control({
-            '/get': {
-                type: 'get',
-                method: me.get() // fn
-            },
-            '/create': {
-                type: 'post',
-                method: me.create
-            },
-            '/update': {
-                type: 'post',
-                method: me.update
-            },
-            '/remove': {
-                type: 'post',
-                method: me.remove
-            }
-        });
-    },
-
-    get: function(req, res) {
-        console.log('GET METHOD CORRECTLY REGISTERED');
-    },
-
-    create: function () {
-        console.log('Create Student');
+        me.register([{
+            type: 'get',
+            fn: me.get,
+            url: 'get'
+        }, {
+            type: 'post',
+            fn: me.create,
+            url: 'create'
+        }, {
+            type: 'post',
+            fn: me.update,
+            url: 'update'
+        }, {
+            type: 'post',
+            fn: me.remove,
+            url: 'remove'
+        }]);
     }
 });

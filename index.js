@@ -21,7 +21,7 @@ function Nox(config) {
     var me = this;
     var router = config.router;
     var name = config.name || "APP";
-    var folder = process.cwd() + "/" + config.folder + "/";        
+    var folder = config.folder + "/";
     var group = {
         mixin: [],
         singleton: [],
@@ -88,6 +88,7 @@ function Nox(config) {
                 object = mapper.getExposedSource(nxPath);
                 if (!sourceMap[nxPath]) {
                     group[groupName].push(nxPath);
+                    // error de parent is always a base
                     sourceMap[nxPath] = dp.createClass(object, parent, router);
                 }
             });
