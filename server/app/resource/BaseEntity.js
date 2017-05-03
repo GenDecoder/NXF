@@ -1,13 +1,9 @@
 Nx.define('APP.resource.BaseEntity', {
     extend: 'Nx.Resource',
     // extend: 'APP.resource.Student',
-
-    test: 1,
-
     init: function () {
-        console.log(2);
+        console.log('RESOURCE - BASE ENTITY');
     },
-
     get: function(req, res) {
         res.json({success: true});
     },

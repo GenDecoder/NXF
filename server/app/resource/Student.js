@@ -8,7 +8,8 @@ Nx.define('APP.resource.Student', {
         // the problem with this is that the intelligence is not gonna work
         // try;
     },
-    init: function () {        
+    init: function () {
+        console.log('RESOURCE - STUDENT');
         var me = this;
         me.register([{
             type: 'get',

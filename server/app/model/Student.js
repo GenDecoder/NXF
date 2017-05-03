@@ -1,46 +1,33 @@
 Nx.define('APP.model.Student', {
-    extend: 'Nx.Model',    
-    init: function() {
-        me.expose(
-            me.getSchema()
-        );
-
-        me.addDependency({
-            name: 'Student',
-            value: me.getSchema()
-        });
-    },
-    getSchema: function() {
-        var orm = APP.application.orm;
-        var instance = APP.application.instance;
-        return instance.define(me.ENTITY, {
+    extend: 'Nx.Model',
+    
+    expose: function() {
+        var me = this;
+        var ORM = DS.app.ORM;        
+        return DS.app.DB.define(me.ENTITY, {
             id: {
-                type: orm.INTEGER,
+                type: ORM.INTEGER,
                 allowNull: false,
                 primaryKey: true
             },
-            name: orm.STRING(45),
+            name: ORM.STRING(45),
             username: {
-                type: orm.STRING(20),
+                type: ORM.STRING(20),
                 validate: {
                     notEmpty: true
                 }
             },
             password: {
-                type: orm.STRING(20),
+                type: ORM.STRING(20),
                 validate: {
                     notEmpty: true
                 }
             },
-            last_name: orm.STRING(45)
+            last_name: ORM.STRING(45)
         }, {
-            tableName: this.ENTITY,
-            setterMethods: {
-
-            },
-            getterMethods: {
-
-            }
+            tableName: "USER",
+            setterMethods: {},
+            getterMethods: {}
         });
-    }
+    }   
 });

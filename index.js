@@ -19,7 +19,7 @@ function Nox(config) {
     var group = [];    
     var router = config.router;
     var name = config.name || "APP";
-    var folder = config.folder + "/";
+    var folder = config.folder + "/";    
     var pathMap = pathManager.getPathMap(name, folder);
     var mixinUp = function(source) {
         _.each(source.mixins, function iterator(mixinNxPath) {            
@@ -71,10 +71,7 @@ function Nox(config) {
             } else
                  throw new Error(nxPath + " not found, review the file structure or look for typo errors in the Nx.define, there must exists consistency");
         };        
-        // Trigger the "Nx.define" method for all Sources.
-        // _.each(pathMap.js.absolutePathList, function iterator(absolutePath) {
-        //     require(absolutePath);
-        // });
+        // Trigger the "Nx.define" method for all Sources.     
         _.each(pathMap.js.absolutePathList, require);
         // Create roads and group them.
         _.each(pathMap.js.nxPathList, function iterator(nxPath) {           
