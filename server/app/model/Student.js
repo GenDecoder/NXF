@@ -1,9 +1,8 @@
 Nx.define('APP.model.Student', {
-    extend: 'Nx.Model',
-    
+    extend: 'Nx.Model',    
     expose: function() {
         var me = this;
-        var ORM = DS.app.ORM;        
+        var ORM = DS.app.ORM;
         return DS.app.DB.define(me.ENTITY, {
             id: {
                 type: ORM.INTEGER,
