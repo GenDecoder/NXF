@@ -13,10 +13,7 @@ if (!global.Nx) {
     // NX will have the same methods that underscore has.
     _.extend(Nx, _);
 }
-/**
- * Class constructor.
- * @param {Object} config 
- */
+// NX constructor.
 function Nox(config) {
     var me = this;
     var group = [];    
@@ -75,9 +72,10 @@ function Nox(config) {
                  throw new Error(nxPath + " not found, review the file structure or look for typo errors in the Nx.define, there must exists consistency");
         };        
         // Trigger the "Nx.define" method for all Sources.
-        _.each(pathMap.js.absolutePathList, function iterator(absolutePath) {
-            require(absolutePath);
-        });
+        // _.each(pathMap.js.absolutePathList, function iterator(absolutePath) {
+        //     require(absolutePath);
+        // });
+        _.each(pathMap.js.absolutePathList, require);
         // Create roads and group them.
         _.each(pathMap.js.nxPathList, function iterator(nxPath) {           
             var groupName;

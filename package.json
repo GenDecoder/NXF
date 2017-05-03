@@ -5,6 +5,7 @@
   "description": "Node JS Framework",
   "main": "index.js",
   "dependencies": {
+    "fs": "*",
     "underscore": "*"
   },
   "devDependencies": {},
